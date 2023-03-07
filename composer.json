@@ -1,0 +1,34 @@
+{
+    "name": "empaphy/bcmaph",
+    "description": "Additions to the bcmath extension for PHP",
+    "keywords": ["bcmath"],
+    "homepage": "https://bcmaph.empaphy.org/",
+    "license": "MIT",
+    "authors": [
+        { "name": "Alwin Garside", "email": "alwin@garsi.de",  "homepage": "https://yogarine.net" }
+    ],
+    "support": {
+        "issues": "https://github.com/empaphy/bcmaph/issues",
+        "forum": "https://github.com/empaphy/bcmaph/discussions",
+        "wiki": "https://github.com/empaphy/bcmaph/wiki",
+        "source": "https://github.com/empaphy/bcmaph",
+        "docs": "https://bcmaph.empaphy.org/",
+        "rss": "https://github.com/empaphy/bcmaph/releases.atom"
+    },
+    "require": {
+        "php": ">=7.0",
+        "ext-bcmath": "*",
+        "empaphy/polyphill-bcmath": "^1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8",
+        "phpstan/phpstan": "^1",
+        "roave/security-advisories": "dev-latest"
+    },
+    "autoload": {
+        "files": [
+            "src/bcmaph.php"
+        ]
+    },
+    "prefer-stable": true
+}
