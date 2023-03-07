@@ -87,23 +87,23 @@ final class BcmathTest extends TestCase
 
         for ($i = 0; $i < 29; $i++) {
             $data[] = [
-                (string) $i,      // expected
-                (string) ($i + 7),  // target (expected + 7)
-                '0',              // min
-                '20',             // max
-                fn($g) => bcadd($g, '7'), // test
+                (string) $i,                      // expected
+                (string) ($i + 7),                // target (expected + 7)
+                '0',                              // min
+                '20',                             // max
+                function($g) { return bcadd($g, '7'); }, // test
                 0,
             ];
         }
 
         return [
             [
-                '1.160808205961694', // expected
-                '17', // target
-                '0',  // min
-                '2',  // max
-                fn($g) => bcpow($g, '19', 15), // test
-                15,   //scale
+                '1.160808205961694',                          // expected
+                '17',                                         // target
+                '0',                                          // min
+                '2',                                          // max
+                function($g) { return bcpow($g, '19', 15); }, // test
+                15,                                           //scale
             ] + $data,
         ];
     }
@@ -156,5 +156,4 @@ final class BcmathTest extends TestCase
             ],
         ];
     }
-
 }

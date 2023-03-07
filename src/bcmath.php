@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
 
 declare(strict_types=1);
 
@@ -58,6 +58,7 @@ function bcroot(string $num, string $n = '2', ?int $scale = null): ?string {
 
     // if n == 2
     if (bccomp($n, '2', $scale) === 0) {
+        /** @noinspection PhpStrictTypeCheckingInspection */
         return bcsqrt($num, $scale);
     }
 
@@ -80,7 +81,15 @@ function bcroot(string $num, string $n = '2', ?int $scale = null): ?string {
     }
 
     // Call bcapprox to approximate r.
-    return bcapprox($num, $n_min, $n_max, fn($r) => bcpow($r, $n, $scale), $scale);
+    return bcapprox(
+        $num,
+        $n_min,
+        $n_max,
+        static function($r) use ($scale, $n) {
+            return bcpow($r, $n, $scale);
+        },
+        $scale
+    );
 }
 
 /**
@@ -97,7 +106,7 @@ function bcroot(string $num, string $n = '2', ?int $scale = null): ?string {
  * @return string  The input value that gave the closest approximation.
  */
 function bcapprox(
-    mixed $target,
+    $target,
     string $min,
     string $max,
     callable $callable,
@@ -171,10 +180,10 @@ function bcapprox(
  *
  * @todo Use $precision to round numbers.
  */
-function bcnormalize(mixed $value, ?int $precision = null): int|float
+function bcnormalize($value, ?int $precision = null)
 {
     if (is_string($value) && is_numeric($value)) {
-        if (str_contains($value, '.')) {
+        if (strpos($value, '.') !== false) {
             // TODO: how are values rounded?
             return (float) $value;
         }
@@ -298,16 +307,24 @@ function bcsign(string $num, ?int $scale = null): string
  * @param  string|null  $num
  * @return int
  */
-function bcgetscale(string $num = null): int
+function bcgetscale(?string $num = null): int
 {
     if (null === $num) {
         if (version_compare(PHP_VERSION, '7.3.0') >= 0) {
-            // PHP 7.3.0 and higher return the current scale when calling `bcscale()`
+            /** PHP 7.3.0 and higher return the current scale when calling `bcscale()`.
+             * @noinspection PhpParamsInspection
+             * @noinspection PhpStrictTypeCheckingInspection */
             return bcscale();
         }
 
-        // Get a sample number.
+        /** Get a sample number.
+         * @noinspection CallableParameterUseCaseInTypeContextInspection */
         $num = bcsqrt('2');
+
+        /** @noinspection PhpConditionAlreadyCheckedInspection */
+        if (null === $num) {
+            throw new RuntimeException("Got invalid value from `bcsqrt()`: operand is probably negative");
+        }
     }
 
     $periodPos = strpos($num, '.');
