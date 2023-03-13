@@ -10,7 +10,7 @@
          convertWarningsToExceptions="true">
 
   <testsuites>
-    <testsuite>
+    <testsuite name="bcmath">
       <directory>tests</directory>
     </testsuite>
   </testsuites>
