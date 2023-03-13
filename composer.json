@@ -1,12 +1,11 @@
 {
-    "name": "empaphy/colorphul",
-    "description": "Color library for PHP",
+    "name": "empaphy/bcmath-additions",
+    "description": "Additions for PHP bcmath",
     "license": "MIT",
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
         "php": ">=7.2",
-        "empaphy/composer-yaml": "^1.1",
         "ext-bcmath": "*"
     },
     "require-dev": {
@@ -16,10 +15,5 @@
         "files": [
             "src/bcmath.php"
         ]
-    },
-    "config": {
-        "allow-plugins": {
-            "empaphy/composer-yaml": true
-        }
     }
 }
