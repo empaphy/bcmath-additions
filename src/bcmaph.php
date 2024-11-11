@@ -58,6 +58,41 @@ function bcceil(string $num, int $scale = null): string
 }
 
 /**
+ * Sine, with arbitrary precision.
+ *
+ * Returns the sine of the `$num` parameter. The `$num` parameter is in radians.
+ *
+ * @param  numeric-string  $num  A value in radians.
+ * @param  int|null        $scale
+ * @return numeric-string The sine of `$num`.
+ */
+function bcsin(string $num, int $scale = null): string
+{
+    $numScale = \max($scale, bcgetscale($num)) + 5;
+    $tolerance = \bcpow('10', (string) -$scale, $scale);
+    $n = 1;
+    $nf = '1';
+    $x = $num;
+    $y = '1';
+
+    do {
+        $nf = \bcmul($nf, (string) ++$n, 0);
+
+        if ($n % 2 === 1) {
+            $y = \bcdiv(\bcpow($num, (string) $n, $numScale), $nf, $numScale);
+
+            if ((($n - 1) / 2) % 2 === 0) {
+                $x = \bcadd($x, $y, $numScale);
+            } else {
+                $x = \bcsub($x, $y, $numScale);
+            }
+        }
+    } while ($n < 1000 && \bccomp(bcabs($y, $scale + 1), $tolerance, $scale) === 1);
+
+    return bcround($x, $scale);
+}
+
+/**
  * Calculate the symmetric difference quotient of `$f($x±$h)` with arbitrary precision.
  *
  * It is defined as:
