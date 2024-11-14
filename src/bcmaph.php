@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace empaphy\bcmaph;
 
 /**
- * Get the absolute value of a number.
+ * The maximum number of decimal digits that BCMath supports.
+ */
+const BC_MAX_SCALE = 0x7FFFFFFF;
+
+/**
+ * Returns the absolute value of an arbitrary precision number.
  *
  * @param  numeric-string    $num
  * @param  int|null  $scale  Optional number of digits after the decimal point.
@@ -22,39 +27,46 @@ function bcabs(string $num, int $scale = null): string
 }
 
 /**
- * Round fractions up.
+ * Round an arbitrary precision number up.
  *
- * Returns the next highest integer value by rounding up `$num` if necessary.
+ * Returns the next highest integer value within the provided `$scale` by rounding up `$num` if necessary.
  *
- * @param  numeric-string    $num    The value to round, as a string.
- * @param  int|null  $scale  This optional parameter is used to set the number
- *                           of digits after the decimal place in the result. If
- *                           omitted, it will default to the scale set globally
- *                           with the {@see bcscale()} function, or fallback to
- *                           `0` if  this has not been set.
- * @return numeric-string `$num` rounded up to the next highest integer, as a string.
+ * @param  numeric-string          $num    The value to round.
+ * @param  int<0,2147483647>|null  $scale  The number of digits after the decimal place to consider. If omitted, it will
+ *                                         default to the scale of `$num`.
+ * @return numeric-string `$num` rounded up to the next highest integer. The return value of {@see bcceil()} is still of
+ *                        type string as the value range may be bigger than that of int.
  */
 function bcceil(string $num, int $scale = null): string
 {
-    $numScale = bcgetscale($num);
+    $periodPos = \strpos($num, '.');
+    if (false === $periodPos) {
+        return $num;
+    }
 
-    // Removes any trailing digits beyond scale.
-    $scaled = \bcadd($num, '0', $scale);
+    $offset = $periodPos + 1;
+    $numScale = \strlen($num) - $offset;
 
-    // If $num's scale is already below wat we're `ceil()`ing for,
-    // or the 'scaled' $num is identical to num, just return $scaled.
-    if ($numScale < $scale || \bccomp($scaled, $num, $numScale) !== -1) {
-        return $scaled;
+    if (null === $scale) {
+        $scale = \min($numScale, BC_MAX_SCALE);
+    } elseif ($scale < 0 || $scale > BC_MAX_SCALE) {
+        throw new \ValueError(__FUNCTION__ . '(): Argument #2 ($scale) must be between 0 and ' . BC_MAX_SCALE);
+    } else {
+        // No need to use a scale larger than that of `$num`.
+        $scale = \min($scale, $numScale);
     }
 
     /**
-     * Add a fraction at the last position of the scale.
-     *
-     * @var numeric-string $correction
+     * @var numeric-string $floor
      */
-    $correction = '0.' . \str_repeat('0', $scale - 1) . '1'; // @phpstan-ignore varTag.nativeType
+    $floor = \substr($num, 0, $periodPos);
 
-    return \bcadd($scaled, $correction, $scale);
+    // This may seem inefficient, but it's actually both the fastest and most memory efficient way to do this.
+    if (\preg_match('/[1-9]/', $num, $matches, PREG_OFFSET_CAPTURE, $offset) && $matches[0][1] < $offset + $scale) {
+        return ('-' === $floor[0]) ? \bcsub($floor, '1', 0) : \bcadd($floor, '1', 0);
+    }
+
+    return $floor;
 }
 
 /**

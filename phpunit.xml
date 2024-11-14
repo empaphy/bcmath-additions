@@ -9,6 +9,10 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true">
 
+  <php>
+    <ini name="memory_limit" value="2560M" />
+  </php>
+
   <testsuites>
     <testsuite name="bcmath">
       <directory>tests</directory>
